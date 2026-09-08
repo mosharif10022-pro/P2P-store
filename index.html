@@ -1,360 +1,365 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P2P - Present 2 Print | متجر الهدايا والمجات المخصصة</title>
-  <style>
-    :root {
-      --primary-color: #e74c3c;
-      --secondary-color: #2c3e50;
-      --accent-color: #25D366;
-      --bg-color: #f4f7f6;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: #333;
-      padding-bottom: 40px;
-    }
-
-    header {
-      background: #fff;
-      text-align: center;
-      padding-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      margin-bottom: 30px;
-      overflow: hidden;
-    }
-
-    .banner-container {
-      width: 100%;
-      max-height: 250px;
-      overflow: hidden;
-      margin-bottom: 15px;
-    }
-
-    .banner-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    header h1 {
-      color: var(--secondary-color);
-      font-size: 26px;
-      margin-bottom: 5px;
-    }
-
-    header p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 15px;
-    }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .product-card {
-      background: #fff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    }
-
-    .product-image {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      background-color: #eee;
-    }
-
-    .product-details {
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-      justify-content: space-between;
-    }
-
-    .product-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: var(--secondary-color);
-      margin-bottom: 8px;
-    }
-
-    .product-price {
-      font-size: 17px;
-      color: var(--primary-color);
-      font-weight: bold;
-      margin-bottom: 12px;
-    }
-
-    .btn-order {
-      background-color: var(--secondary-color);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      text-align: center;
-      width: 100%;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 15px;
-      overflow-y: auto;
-    }
-
-    .modal-content {
-      background: white;
-      border-radius: 12px;
-      max-width: 500px;
-      width: 100%;
-      padding: 20px;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .close-btn {
-      position: absolute;
-      left: 15px;
-      top: 15px;
-      font-size: 22px;
-      cursor: pointer;
-      color: #888;
-    }
-
-    .modal-product-info {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .modal-product-img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-      text-align: right;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #444;
-    }
-
-    .form-group input, .form-group textarea {
-      width: 100%;
-      padding: 9px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 13px;
-    }
-
-    .btn-submit {
-      width: 100%;
-      background-color: var(--accent-color);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <div class="banner-container">
-      <img src="banner.jpg" alt="P2P Banner" class="banner-img">
-    </div>
-    <h1>P2P - Present 2 Print 🎁</h1>
-    <p>اختر تصميمك المفضّل واطبع أحلى ذكرياتك</p>
-  </header>
-
-  <div class="container">
-    <div class="products-grid" id="products-container"></div>
-  </div>
-
-  <div class="modal" id="orderModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      
-      <div class="modal-product-info">
-        <img id="modal-img" src="" class="modal-product-img" alt="صورة المنتج">
-        <h3 id="modal-title"></h3>
-        <p id="modal-price" style="color: var(--primary-color); font-weight: bold;"></p>
-      </div>
-
-      <form id="orderForm" onsubmit="handleOrderSubmit(event)">
-        <div class="form-group">
-          <label>الاسم/العبارة للطباعة على المج:</label>
-          <input type="text" id="printText" placeholder="مثال: أحمد ومريم / 12-10-2024" required>
-        </div>
-        <div class="form-group">
-          <label>العدد المطلوب:</label>
-          <input type="number" id="quantity" value="1" min="1" required>
-        </div>
-        <hr style="margin: 12px 0; border: 0.5px solid #eee;">
-        <div class="form-group">
-          <label>اسمك بالكامل:</label>
-          <input type="text" id="customerName" placeholder="الاسم الثلاثي" required>
-        </div>
-        <div class="form-group">
-          <label>رقم الموبايل:</label>
-          <input type="tel" id="customerPhone" placeholder="01xxxxxxxx" required>
-        </div>
-        <div class="form-group">
-          <label>العنوان بالكامل:</label>
-          <textarea id="customerAddress" rows="2" placeholder="المحافظة / المدينة / اسم الشارع" required></textarea>
-        </div>
-
-        <button type="submit" class="btn-submit">إرسال الطلب عبر الواتساب 💬</button>
-      </form>
-    </div>
-  </div>
-
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-  <script>
-    const products = [
-      { id: 1, title: "مج كبلز للخطوبة والزواج (طقم 2 مج)", price: 290, image: "mug1.jpg" },
-      { id: 2, title: "مج مخصص بالأسماء والخط العربي", price: 150, image: "mug2.jpg" },
-      { id: 3, title: "مج مخصص بطباعة الصور الشخصية", price: 150, image: "mug3.jpg" },
-      { id: 4, title: "مج سحري متغير بالحرارة مع علبة هدية", price: 170, image: "mug4.jpg" },
-      { id: 5, title: "بوكس هدية متكامل (مج + برواز مطبوع)", price: 600, image: "mug5.jpg" }
-    ];
-
-    let selectedProduct = null;
-
-    const container = document.getElementById('products-container');
-    products.forEach(product => {
-      container.innerHTML += `
-        <div class="product-card" onclick="openModal(${product.id})">
-          <img src="${product.image}" alt="${product.title}" class="product-image">
-          <div class="product-details">
-            <div class="product-title">${product.title}</div>
-            <div class="product-price">${product.price} جنيه</div>
-            <button class="btn-order">اطلب الآن 🎁</button>
-          </div>
-        </div>
-      `;
-    });
-
-    function openModal(productId) {
-      selectedProduct = products.find(p => p.id === productId);
-      document.getElementById('modal-img').src = selectedProduct.image;
-      document.getElementById('modal-title').innerText = selectedProduct.title;
-      document.getElementById('modal-price').innerText = selectedProduct.price + " جنيه مصري";
-      document.getElementById('orderModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('orderModal').style.display = 'none';
-      document.getElementById('orderForm').reset();
-    }
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCqkm8w79_62HLj2UCVv2SHXnCUt29TWU",
-      authDomain: "p2pstore.firebaseapp.com",
-      databaseURL: "https://p2pstore-default-rtdb.firebaseio.com",
-      projectId: "p2pstore",
-      storageBucket: "p2pstore.firebasestorage.app",
-      messagingSenderId: "802312373719",
-      appId: "1:802312373719:web:3f929aa332bc61b8ae6792"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    const myPhoneNumber = "201128403873";
-
-    async function handleOrderSubmit(event) {
-      event.preventDefault();
-
-      const printText = document.getElementById('printText').value;
-      const qty = document.getElementById('quantity').value;
-      const customerName = document.getElementById('customerName').value;
-      const customerPhone = document.getElementById('customerPhone').value;
-      const customerAddress = document.getElementById('customerAddress').value;
-
-      const newOrderRef = database.ref('orders').push();
-      await newOrderRef.set({
-        productName: selectedProduct.title,
-        printText: printText,
-        quantity: qty,
-        totalPrice: selectedProduct.price * qty,
-        customerName: customerName,
-        customerPhone: customerPhone,
-        customerAddress: customerAddress,
-        timestamp: new Date().toISOString()
-      });
-
-      let message = `*طلب جديد من المتجر (P2P) 🎁*%0A%0A`;
-      message += `*المنتج:* ${selectedProduct.title}%0A`;
-      message += `*الكمية:* ${qty}%0A`;
-      message += `*الإجمالي:* ${selectedProduct.price * qty} جنيه%0A`;
-      message += `------------------------%0A`;
-      message += `*الاسم/العبارة للطباعة:* ${printText}%0A`;
-      message += `*(يرجى إرفاق الصورة المراد طباعتها في هذه المحادثة إن وجدت)*%0A`;
-      message += `------------------------%0A`;
-      message += `*بيانات العميل:*%0A`;
-      message += `*الاسم:* ${customerName}%0A`;
-      message += `*الهاتف:* ${customerPhone}%0A`;
-      message += `*العنوان:* ${customerAddress}`;
-
-      closeModal();
-      window.open(`https://wa.me/${myPhoneNumber}?text=${message}`, '_blank');
-    }
-  </script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P2P - Present 2 Print | متجر الهدايا والمجات المخصصة</title>
+  <style>
+    :root {
+      --primary-color: #e74c3c;
+      --secondary-color: #2c3e50;
+      --accent-color: #25D366;
+      --bg-color: #f4f7f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: #333;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: #fff;
+      text-align: center;
+      padding-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .banner-container {
+      width: 100%;
+      max-height: 250px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    .banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    header h1 {
+      color: var(--secondary-color);
+      font-size: 26px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background-color: #eee;
+    }
+
+    .product-details {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .product-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--secondary-color);
+      margin-bottom: 8px;
+    }
+
+    .product-price {
+      font-size: 17px;
+      color: var(--primary-color);
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .btn-order {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      width: 100%;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      padding: 20px;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .close-btn {
+      position: absolute;
+      left: 15px;
+      top: 15px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .modal-product-info {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .modal-product-img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      text-align: right;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 9px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="banner-container">
+      <img src="banner.jpg" alt="P2P Banner" class="banner-img">
+    </div>
+    <h1>P2P - Present 2 Print 🎁</h1>
+    <p>اختر تصميمك المفضّل واطبع أحلى ذكرياتك</p>
+  </header>
+
+  <div class="container">
+    <div class="products-grid" id="products-container"></div>
+  </div>
+
+  <div class="modal" id="orderModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      
+      <div class="modal-product-info">
+        <img id="modal-img" src="" class="modal-product-img" alt="صورة المنتج">
+        <h3 id="modal-title"></h3>
+        <p id="modal-price" style="color: var(--primary-color); font-weight: bold;"></p>
+      </div>
+
+      <form id="orderForm" onsubmit="handleOrderSubmit(event)">
+        <div class="form-group">
+          <label>الاسم/العبارة للطباعة على المج:</label>
+          <input type="text" id="printText" placeholder="مثال: أحمد ومريم / 12-10-2024" required>
+        </div>
+        <div class="form-group">
+          <label>العدد المطلوب:</label>
+          <input type="number" id="quantity" value="1" min="1" required>
+        </div>
+        <hr style="margin: 12px 0; border: 0.5px solid #eee;">
+        <div class="form-group">
+          <label>اسمك بالكامل:</label>
+          <input type="text" id="customerName" placeholder="الاسم الثلاثي" required>
+        </div>
+        <div class="form-group">
+          <label>رقم الموبايل:</label>
+          <input type="tel" id="customerPhone" placeholder="01xxxxxxxx" required>
+        </div>
+        <div class="form-group">
+          <label>العنوان بالكامل:</label>
+          <textarea id="customerAddress" rows="2" placeholder="المحافظة / المدينة / اسم الشارع" required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">إرسال الطلب عبر الواتساب 💬</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    const products = [
+      { id: 1, title: "مج كبلز للخطوبة والزواج (طقم 2 مج)", price: 290, image: "mug1.jpg" },
+      { id: 2, title: "مج مخصص بالأسماء والخط العربي", price: 150, image: "mug2.jpg" },
+      { id: 3, title: "مج مخصص بطباعة الصور الشخصية", price: 150, image: "mug3.jpg" },
+      { id: 4, title: "مج سحري متغير بالحرارة مع علبة هدية", price: 180, image: "mug4.jpg" },
+      { id: 5, title: "بوكس هدية متكامل (2مج + برواز مطبوع)", price: 600, image: "mug5.jpg" },
+      { id: 6, title: "بصمه أو برواز كتب الكتاب   (أشكال متعددة)", price: 150, image: "mug6.jpg" },
+      { id: 7, title: "منديل كتب الكتاب مطبوع (أشكال متعدده)", price: 150, image: "mug7.jpg" },
+      { id: 8, title: "منديل كتب الكتاب مطبوع (أشكال وتصاميم متعدده)", price: 150, image: "mug8.jpg" },
+      { id: 9, title: " المنديل والبرواز لكتب الكتاب عرض خاص(أشكال وتصاميم متعدده)", price: 260, image: "mug9.jpg" },
+      { id: 10, title: "تابلوه للصور و الأشكال و العبارات (تصميمات مختلفه)", price: 130, image: "mug10.jpg" }
+    ];
+
+    let selectedProduct = null;
+
+    const container = document.getElementById('products-container');
+    products.forEach(product => {
+      container.innerHTML += `
+        <div class="product-card" onclick="openModal(${product.id})">
+          <img src="${product.image}" alt="${product.title}" class="product-image">
+          <div class="product-details">
+            <div class="product-title">${product.title}</div>
+            <div class="product-price">${product.price} جنيه</div>
+            <button class="btn-order">اطلب الآن 🎁</button>
+          </div>
+        </div>
+      `;
+    });
+
+    function openModal(productId) {
+      selectedProduct = products.find(p => p.id === productId);
+      document.getElementById('modal-img').src = selectedProduct.image;
+      document.getElementById('modal-title').innerText = selectedProduct.title;
+      document.getElementById('modal-price').innerText = selectedProduct.price + " جنيه مصري";
+      document.getElementById('orderModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('orderModal').style.display = 'none';
+      document.getElementById('orderForm').reset();
+    }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqkm8w79_62HLj2UCVv2SHXnCUt29TWU",
+      authDomain: "p2pstore.firebaseapp.com",
+      databaseURL: "https://p2pstore-default-rtdb.firebaseio.com",
+      projectId: "p2pstore",
+      storageBucket: "p2pstore.firebasestorage.app",
+      messagingSenderId: "802312373719",
+      appId: "1:802312373719:web:3f929aa332bc61b8ae6792"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const myPhoneNumber = "201128403873";
+
+    async function handleOrderSubmit(event) {
+      event.preventDefault();
+
+      const printText = document.getElementById('printText').value;
+      const qty = document.getElementById('quantity').value;
+      const customerName = document.getElementById('customerName').value;
+      const customerPhone = document.getElementById('customerPhone').value;
+      const customerAddress = document.getElementById('customerAddress').value;
+
+      const newOrderRef = database.ref('orders').push();
+      await newOrderRef.set({
+        productName: selectedProduct.title,
+        printText: printText,
+        quantity: qty,
+        totalPrice: selectedProduct.price * qty,
+        customerName: customerName,
+        customerPhone: customerPhone,
+        customerAddress: customerAddress,
+        timestamp: new Date().toISOString()
+      });
+
+      let message = `*طلب جديد من المتجر (P2P) 🎁*%0A%0A`;
+      message += `*المنتج:* ${selectedProduct.title}%0A`;
+      message += `*الكمية:* ${qty}%0A`;
+      message += `*الإجمالي:* ${selectedProduct.price * qty} جنيه%0A`;
+      message += `------------------------%0A`;
+      message += `*الاسم/العبارة للطباعة:* ${printText}%0A`;
+      message += `*(يرجى إرفاق الصورة المراد طباعتها في هذه المحادثة إن وجدت)*%0A`;
+      message += `------------------------%0A`;
+      message += `*بيانات العميل:*%0A`;
+      message += `*الاسم:* ${customerName}%0A`;
+      message += `*الهاتف:* ${customerPhone}%0A`;
+      message += `*العنوان:* ${customerAddress}`;
+
+      closeModal();
+      window.open(`https://wa.me/${myPhoneNumber}?text=${message}`, '_blank');
+    }
+  </script>
+</body>
+</html>
