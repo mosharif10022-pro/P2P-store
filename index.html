@@ -223,10 +223,6 @@
           <input type="text" id="printText" placeholder="مثال: أحمد ومريم / 12-10-2024" required>
         </div>
         <div class="form-group">
-          <label>ارفق صورة للطباعة (اختياري):</label>
-          <input type="file" id="printImage" accept="image/*">
-        </div>
-        <div class="form-group">
           <label>العدد المطلوب:</label>
           <input type="number" id="quantity" value="1" min="1" required>
         </div>
@@ -249,10 +245,8 @@
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
   <script>
     const products = [
@@ -292,7 +286,6 @@
       document.getElementById('orderForm').reset();
     }
 
-    // إعدادات Firebase الخاصة بمشروعك P2Pstore
     const firebaseConfig = {
       apiKey: "AIzaSyCqkm8w79_62HLj2UCVv2SHXnCUt29TWU",
       authDomain: "p2pstore.firebaseapp.com",
@@ -305,7 +298,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    const storage = firebase.storage();
     const myPhoneNumber = "201128403873";
 
     async function handleOrderSubmit(event) {
@@ -316,16 +308,6 @@
       const customerName = document.getElementById('customerName').value;
       const customerPhone = document.getElementById('customerPhone').value;
       const customerAddress = document.getElementById('customerAddress').value;
-      const fileInput = document.getElementById('printImage');
-
-      let imageUrl = "لا يوجد صورة مرفقة";
-
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        const storageRef = storage.ref(`orders_images/${Date.now()}_${file.name}`);
-        const snapshot = await storageRef.put(file);
-        imageUrl = await snapshot.ref.getDownloadURL();
-      }
 
       const newOrderRef = database.ref('orders').push();
       await newOrderRef.set({
@@ -336,7 +318,6 @@
         customerName: customerName,
         customerPhone: customerPhone,
         customerAddress: customerAddress,
-        imageUrl: imageUrl,
         timestamp: new Date().toISOString()
       });
 
@@ -346,9 +327,7 @@
       message += `*الإجمالي:* ${selectedProduct.price * qty} جنيه%0A`;
       message += `------------------------%0A`;
       message += `*الاسم/العبارة للطباعة:* ${printText}%0A`;
-      if (imageUrl !== "لا يوجد صورة مرفقة") {
-        message += `*رابط الصورة المرفقة:* ${imageUrl}%0A`;
-      }
+      message += `*(يرجى إرفاق الصورة المراد طباعتها في هذه المحادثة إن وجدت)*%0A`;
       message += `------------------------%0A`;
       message += `*بيانات العميل:*%0A`;
       message += `*الاسم:* ${customerName}%0A`;
