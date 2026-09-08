@@ -25,7 +25,6 @@
       padding-bottom: 40px;
     }
 
-    /* Header Styling */
     header {
       background: #fff;
       text-align: center;
@@ -45,7 +44,6 @@
       font-size: 14px;
     }
 
-    /* Products Grid */
     .container {
       max-width: 1000px;
       margin: 0 auto;
@@ -115,7 +113,6 @@
       width: 100%;
     }
 
-    /* Modal Styling */
     .modal {
       display: none;
       position: fixed;
@@ -164,7 +161,6 @@
       margin-bottom: 10px;
     }
 
-    /* Form Fields */
     .form-group {
       margin-bottom: 12px;
       text-align: right;
@@ -208,12 +204,9 @@
   </header>
 
   <div class="container">
-    <div class="products-grid" id="products-container">
-      <!-- سيتم تحميل الـ 5 منتجات هنا تلقائياً بواسطة JavaScript -->
-    </div>
+    <div class="products-grid" id="products-container"></div>
   </div>
 
-  <!-- النافذة المنبثقة لإدخال التفاصيل -->
   <div class="modal" id="orderModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -262,43 +255,16 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
   <script>
-    // 1. قائمة المنتجات الـ 5
     const products = [
-      {
-        id: 1,
-        title: "مج كبلز للخطوبة والزواج (طقم 2 مج)",
-        price: 350,
-        image: "mug1.jpg"
-      },
-      {
-        id: 2,
-        title: "مج مخصص بالأسماء والخط العربي",
-        price: 220,
-        image: "mug2.jpg"
-      },
-      {
-        id: 3,
-        title: "مج مخصص بطباعة الصور الشخصية",
-        price: 200,
-        image: "mug3.jpg"
-      },
-      {
-        id: 4,
-        title: "مج سحري متغير بالحرارة مع علبة هدية",
-        price: 280,
-        image: "mug4.jpg"
-      },
-      {
-        id: 5,
-        title: "بوكس هدية متكامل (مج + برواز مطبوع)",
-        price: 450,
-        image: "mug5.jpg"
-      }
+      { id: 1, title: "مج كبلز للخطوبة والزواج (طقم 2 مج)", price: 350, image: "mug1.jpg" },
+      { id: 2, title: "مج مخصص بالأسماء والخط العربي", price: 220, image: "mug2.jpg" },
+      { id: 3, title: "مج مخصص بطباعة الصور الشخصية", price: 200, image: "mug3.jpg" },
+      { id: 4, title: "مج سحري متغير بالحرارة مع علبة هدية", price: 280, image: "mug4.jpg" },
+      { id: 5, title: "بوكس هدية متكامل (مج + برواز مطبوع)", price: 450, image: "mug5.jpg" }
     ];
 
     let selectedProduct = null;
 
-    // 2. عرض المنتجات في الصفحة
     const container = document.getElementById('products-container');
     products.forEach(product => {
       container.innerHTML += `
@@ -313,7 +279,6 @@
       `;
     });
 
-    // 3. التحكم بالنافذة المنبثقة
     function openModal(productId) {
       selectedProduct = products.find(p => p.id === productId);
       document.getElementById('modal-img').src = selectedProduct.image;
@@ -327,15 +292,15 @@
       document.getElementById('orderForm').reset();
     }
 
-    // 4. إعداد فايربيز (استبدل البيانات بخاصتك)
+    // إعدادات Firebase الخاصة بمشروعك P2Pstore
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyCqkm8w79_62HLj2UCVv2SHXnCUt29TWU",
+      authDomain: "p2pstore.firebaseapp.com",
+      databaseURL: "https://p2pstore-default-rtdb.firebaseio.com",
+      projectId: "p2pstore",
+      storageBucket: "p2pstore.firebasestorage.app",
+      messagingSenderId: "802312373719",
+      appId: "1:802312373719:web:3f929aa332bc61b8ae6792"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -343,7 +308,6 @@
     const storage = firebase.storage();
     const myPhoneNumber = "201128403873";
 
-    // 5. معالجة وتأكيد الطلب
     async function handleOrderSubmit(event) {
       event.preventDefault();
 
@@ -356,7 +320,6 @@
 
       let imageUrl = "لا يوجد صورة مرفقة";
 
-      // رفع الصورة إلى Firebase Storage إذا تم اختيارها
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         const storageRef = storage.ref(`orders_images/${Date.now()}_${file.name}`);
@@ -364,7 +327,6 @@
         imageUrl = await snapshot.ref.getDownloadURL();
       }
 
-      // حفظ البيانات في Firebase Realtime Database
       const newOrderRef = database.ref('orders').push();
       await newOrderRef.set({
         productName: selectedProduct.title,
@@ -378,7 +340,6 @@
         timestamp: new Date().toISOString()
       });
 
-      // تجهيز نص رسالة الواتساب
       let message = `*طلب جديد من المتجر (P2P) 🎁*%0A%0A`;
       message += `*المنتج:* ${selectedProduct.title}%0A`;
       message += `*الكمية:* ${qty}%0A`;
